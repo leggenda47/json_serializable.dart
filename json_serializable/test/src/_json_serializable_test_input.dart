@@ -634,3 +634,86 @@ class TearOffValueClass {
 
   final String value;
 }
+
+@ShouldGenerate(
+  r'''
+Future<FutureFieldClass> _$FutureFieldClassFromJson(
+        Map<String, dynamic> json) async =>
+    FutureFieldClass(
+      await FutureFieldClass.fieldFromJson(json['future'] as String),
+    );
+
+Future<Map<String, dynamic>> _$FutureFieldClassToJson(
+        FutureFieldClass instance) async =>
+    <String, dynamic>{
+      'future': await FutureFieldClass.fieldToJson(instance.future),
+    };
+''',
+)
+@JsonSerializable()
+class FutureFieldClass {
+  static Future<String> fieldFromJson(String value) async => value;
+  static Future<String> fieldToJson(String value) async => value;
+
+  FutureFieldClass(this.future);
+
+  @JsonKey(
+    fromJson: FutureFieldClass.fieldFromJson,
+    toJson: FutureFieldClass.fieldToJson,
+  )
+  final String future;
+}
+
+@ShouldGenerate(
+  r'''
+Future<FutureFieldFromJsonClass> _$FutureFieldFromJsonClassFromJson(
+        Map<String, dynamic> json) async =>
+    FutureFieldFromJsonClass(
+      await FutureFieldFromJsonClass.fieldFromJson(json['future'] as String),
+    );
+
+Map<String, dynamic> _$FutureFieldFromJsonClassToJson(
+        FutureFieldFromJsonClass instance) =>
+    <String, dynamic>{
+      'future': instance.future,
+    };
+''',
+)
+@JsonSerializable()
+class FutureFieldFromJsonClass {
+  static Future<String> fieldFromJson(String value) async => value;
+
+  FutureFieldFromJsonClass(this.future);
+
+  @JsonKey(
+    fromJson: FutureFieldFromJsonClass.fieldFromJson,
+  )
+  final String future;
+}
+
+@ShouldGenerate(
+  r'''
+FutureFieldToJsonClass _$FutureFieldToJsonClassFromJson(
+        Map<String, dynamic> json) =>
+    FutureFieldToJsonClass(
+      json['future'] as String,
+    );
+
+Future<Map<String, dynamic>> _$FutureFieldToJsonClassToJson(
+        FutureFieldToJsonClass instance) async =>
+    <String, dynamic>{
+      'future': await FutureFieldToJsonClass.fieldToJson(instance.future),
+    };
+''',
+)
+@JsonSerializable()
+class FutureFieldToJsonClass {
+  static Future<String> fieldToJson(String value) async => value;
+
+  FutureFieldToJsonClass(this.future);
+
+  @JsonKey(
+    toJson: FutureFieldToJsonClass.fieldToJson,
+  )
+  final String future;
+}

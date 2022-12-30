@@ -85,19 +85,36 @@ mixin EncodeHelper implements HelperCore {
     return buffer.toString();
   }
 
-  Iterable<String> createToJson(Set<FieldElement> accessibleFields) sync* {
+  Iterable<String> createToJson(
+    Set<FieldElement> accessibleFields, {
+    bool hasAsyncToJson = false,
+  }) sync* {
     assert(config.createToJson);
 
     final buffer = StringBuffer();
 
+    if (hasAsyncToJson) {
+      buffer.write('Future<');
+    }
+
+    buffer.write('Map<String, dynamic>');
+
+    if (hasAsyncToJson) {
+      buffer.write('>');
+    }
+
     final functionName =
         '${prefix}ToJson${genericClassArgumentsImpl(withConstraints: true)}';
-    buffer.write('Map<String, dynamic> '
+    buffer.write(' '
         '$functionName($targetClassReference $_toJsonParamName');
 
     if (config.genericArgumentFactories) _writeGenericArgumentFactories(buffer);
 
-    buffer.write(') ');
+    buffer.write(')');
+
+    if (hasAsyncToJson) {
+      buffer.write(' async ');
+    }
 
     final canWriteAllJsonValuesWithoutNullCheck =
         accessibleFields.every(_canWriteJsonWithoutNullCheck);

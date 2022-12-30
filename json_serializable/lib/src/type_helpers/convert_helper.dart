@@ -41,7 +41,11 @@ class ConvertHelper extends TypeHelper<TypeHelperContextWithConvert> {
 
     assert(toJsonData.paramType is TypeParameterType ||
         targetType.isAssignableTo(toJsonData.paramType));
-    return LambdaResult(expression, toJsonData.name);
+    return LambdaResult(
+      expression,
+      toJsonData.name,
+      isAsync: toJsonData.returnType.isDartAsyncFuture,
+    );
   }
 
   @override
@@ -60,6 +64,7 @@ class ConvertHelper extends TypeHelper<TypeHelperContextWithConvert> {
       expression,
       fromJsonData.name,
       asContent: fromJsonData.paramType,
+      isAsync: fromJsonData.returnType.isDartAsyncFuture,
     );
   }
 }

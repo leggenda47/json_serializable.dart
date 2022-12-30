@@ -13,6 +13,8 @@ const coreStringTypeChecker = TypeChecker.fromUrl('dart:core#String');
 
 const coreMapTypeChecker = TypeChecker.fromUrl('dart:core#Map');
 
+const coreFutureTypeChecker = TypeChecker.fromUrl('dart:async#Future');
+
 /// Returns the generic type of the [Iterable] represented by [type].
 ///
 /// If [type] does not extend [Iterable], an error is thrown.

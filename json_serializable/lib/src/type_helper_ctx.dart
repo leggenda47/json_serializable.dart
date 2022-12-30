@@ -9,6 +9,7 @@ import 'package:source_helper/source_helper.dart';
 
 import 'default_container.dart';
 import 'helper_core.dart';
+import 'shared_checkers.dart';
 import 'type_helper.dart';
 import 'type_helpers/config_types.dart';
 import 'type_helpers/convert_helper.dart';
@@ -136,21 +137,27 @@ ConvertData? _convertData(DartObject obj, FieldElement element, bool isFrom) {
   }
 
   final returnType = executableElement.returnType;
+  final returnTypeOrFutureGeneric = returnType.isDartAsyncFuture
+      ? returnType.typeArgumentsOf(coreFutureTypeChecker)!.first
+      : returnType;
+
   final argType = executableElement.parameters.first.type;
   if (isFrom) {
     final hasDefaultValue =
         !jsonKeyAnnotation(element).read('defaultValue').isNull;
 
-    if (returnType is TypeParameterType) {
+    if (returnTypeOrFutureGeneric is TypeParameterType) {
       // We keep things simple in this case. We rely on inferred type arguments
       // to the `fromJson` function.
       // TODO: consider adding error checking here if there is confusion.
-    } else if (!returnType.isAssignableTo(element.type)) {
-      if (returnType.promoteNonNullable().isAssignableTo(element.type) &&
+    } else if (!returnTypeOrFutureGeneric.isAssignableTo(element.type)) {
+      if (returnTypeOrFutureGeneric
+              .promoteNonNullable()
+              .isAssignableTo(element.type) &&
           hasDefaultValue) {
         // noop
       } else {
-        final returnTypeCode = typeToCode(returnType);
+        final returnTypeCode = typeToCode(returnTypeOrFutureGeneric);
         final elementTypeCode = typeToCode(element.type);
         throwUnsupported(
             element,

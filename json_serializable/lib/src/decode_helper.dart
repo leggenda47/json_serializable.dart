@@ -8,6 +8,7 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:source_helper/source_helper.dart';
 
+import '../type_helper.dart';
 import 'helper_core.dart';
 import 'json_literal_generator.dart';
 import 'type_helpers/generic_factory_helper.dart';
@@ -24,13 +25,25 @@ class CreateFactoryResult {
 mixin DecodeHelper implements HelperCore {
   CreateFactoryResult createFactory(
     Map<String, FieldElement> accessibleFields,
-    Map<String, String> unavailableReasons,
-  ) {
+    Map<String, String> unavailableReasons, {
+    bool hasAsyncFromJson = false,
+  }) {
     assert(config.createFactory);
     final buffer = StringBuffer();
 
     final mapType = config.anyMap ? 'Map' : 'Map<String, dynamic>';
-    buffer.write('$targetClassReference '
+
+    if (hasAsyncFromJson) {
+      buffer.write('Future<');
+    }
+
+    buffer.write(targetClassReference);
+
+    if (hasAsyncFromJson) {
+      buffer.write('>');
+    }
+
+    buffer.write(' '
         '${prefix}FromJson${genericClassArgumentsImpl(withConstraints: true)}'
         '($mapType json');
 
@@ -48,6 +61,10 @@ mixin DecodeHelper implements HelperCore {
     }
 
     buffer.write(')');
+
+    if (hasAsyncFromJson) {
+      buffer.write(' async ');
+    }
 
     final fromJsonLines = <String>[];
 

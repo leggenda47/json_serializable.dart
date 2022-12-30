@@ -19,14 +19,30 @@ class LambdaResult {
   final String expression;
   final String lambda;
   final DartType? asContent;
+  final bool isAsync;
 
   String get _fullExpression =>
       asContent != null ? _cast(expression, asContent!) : expression;
 
-  LambdaResult(this.expression, this.lambda, {this.asContent});
+  LambdaResult(
+    this.expression,
+    this.lambda, {
+    this.asContent,
+    this.isAsync = false,
+  });
 
   @override
-  String toString() => '$lambda($_fullExpression)';
+  String toString() {
+    final buffer = StringBuffer();
+
+    if (isAsync) {
+      buffer.write('await ');
+    }
+
+    buffer.write('$lambda($_fullExpression)');
+
+    return buffer.toString();
+  }
 
   static String process(Object subField) =>
       (subField is LambdaResult && closureArg == subField._fullExpression)

@@ -82,8 +82,30 @@ class GeneratorHelper extends HelperCore with EncodeHelper, DecodeHelper {
     );
 
     var accessibleFieldSet = accessibleFields.values.toSet();
+
+    // Check if any field has a Future as their fromJson or toJson.
+    final hasAsyncFromJson = accessibleFieldSet.any(
+      (e) =>
+          getHelperContext(e)
+              .deserializeConvertData
+              ?.returnType
+              .isDartAsyncFuture ??
+          false,
+    );
+    final hasAsyncToJson = accessibleFieldSet.any(
+      (e) =>
+          getHelperContext(e)
+              .serializeConvertData
+              ?.returnType
+              .isDartAsyncFuture ??
+          false,
+    );
     if (config.createFactory) {
-      final createResult = createFactory(accessibleFields, unavailableReasons);
+      final createResult = createFactory(
+        accessibleFields,
+        unavailableReasons,
+        hasAsyncFromJson: hasAsyncFromJson,
+      );
       yield createResult.output;
 
       final fieldsToUse = accessibleFields.entries
@@ -141,7 +163,10 @@ class GeneratorHelper extends HelperCore with EncodeHelper, DecodeHelper {
     }
 
     if (config.createToJson) {
-      yield* createToJson(accessibleFieldSet);
+      yield* createToJson(
+        accessibleFieldSet,
+        hasAsyncToJson: hasAsyncToJson,
+      );
     }
 
     yield* _addedMembers;
