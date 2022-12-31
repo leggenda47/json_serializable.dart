@@ -5,6 +5,7 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:source_helper/source_helper.dart';
@@ -271,5 +272,25 @@ extension ExecutableElementExtension on ExecutableElement {
     throw UnsupportedError(
       'Not sure how to support typeof $runtimeType',
     );
+  }
+}
+
+extension InterfaceElementFromJsonToJsonCtorGetters on InterfaceElement {
+  ExecutableElement? get fromJsonCtor {
+    final fromJsonFactory =
+        constructors.singleWhereOrNull((ce) => ce.name == 'fromJson');
+
+    final futureFromJsonStatic =
+        methods.singleWhereOrNull((sm) => sm.name == 'fromJson');
+
+    return fromJsonFactory ?? futureFromJsonStatic;
+  }
+
+  ExecutableElement? get toJson {
+    final toJson = constructors.singleWhereOrNull((ce) => ce.name == 'toJson');
+
+    final futureToJson = methods.singleWhereOrNull((sm) => sm.name == 'toJson');
+
+    return toJson ?? futureToJson;
   }
 }

@@ -108,6 +108,8 @@ const _expectedAnnotatedTests = {
   'MapKeyNoNullableObject',
   'MapKeyNoNullableString',
   'MapKeyVariety',
+  'NestedFutureFieldJsonClass',
+  'NestedFutureFieldJsonWithExplicitToJsonClass',
   'NoCtorClass',
   'NoDeserializeBadKey',
   'NoDeserializeFieldType',

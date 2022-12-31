@@ -662,6 +662,13 @@ class FutureFieldClass {
     toJson: FutureFieldClass.fieldToJson,
   )
   final String future;
+
+  static Future<FutureFieldClass> fromJson(Map<String, dynamic> json) async =>
+      FutureFieldClass('future');
+
+  Future<Map<String, dynamic>> toJson() async => {
+        'future': future,
+      };
 }
 
 @ShouldGenerate(
@@ -716,4 +723,57 @@ class FutureFieldToJsonClass {
     toJson: FutureFieldToJsonClass.fieldToJson,
   )
   final String future;
+}
+
+@ShouldGenerate(
+  r'''
+Future<NestedFutureFieldJsonClass> _$NestedFutureFieldJsonClassFromJson(
+        Map<String, dynamic> json) async =>
+    NestedFutureFieldJsonClass(
+      await FutureFieldClass.fromJson(json['nested'] as Map<String, dynamic>),
+      json['value'] as String,
+    );
+
+Future<Map<String, dynamic>> _$NestedFutureFieldJsonClassToJson(
+        NestedFutureFieldJsonClass instance) async =>
+    <String, dynamic>{
+      'nested': await instance.nested.toJson(),
+      'value': instance.value,
+    };
+''',
+)
+@JsonSerializable()
+class NestedFutureFieldJsonClass {
+  final FutureFieldClass nested;
+  final String value;
+
+  NestedFutureFieldJsonClass(this.nested, this.value);
+}
+
+@ShouldGenerate(
+  r'''
+Future<NestedFutureFieldJsonWithExplicitToJsonClass>
+    _$NestedFutureFieldJsonWithExplicitToJsonClassFromJson(
+            Map<String, dynamic> json) async =>
+        NestedFutureFieldJsonWithExplicitToJsonClass(
+          await FutureFieldClass.fromJson(
+              json['nested'] as Map<String, dynamic>),
+          json['value'] as String,
+        );
+
+Future<Map<String, dynamic>>
+    _$NestedFutureFieldJsonWithExplicitToJsonClassToJson(
+            NestedFutureFieldJsonWithExplicitToJsonClass instance) async =>
+        <String, dynamic>{
+          'nested': await instance.nested.toJson(),
+          'value': instance.value,
+        };
+''',
+)
+@JsonSerializable(explicitToJson: true)
+class NestedFutureFieldJsonWithExplicitToJsonClass {
+  final FutureFieldClass nested;
+  final String value;
+
+  NestedFutureFieldJsonWithExplicitToJsonClass(this.nested, this.value);
 }

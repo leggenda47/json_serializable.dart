@@ -84,22 +84,9 @@ class GeneratorHelper extends HelperCore with EncodeHelper, DecodeHelper {
     var accessibleFieldSet = accessibleFields.values.toSet();
 
     // Check if any field has a Future as their fromJson or toJson.
-    final hasAsyncFromJson = accessibleFieldSet.any(
-      (e) =>
-          getHelperContext(e)
-              .deserializeConvertData
-              ?.returnType
-              .isDartAsyncFuture ??
-          false,
-    );
-    final hasAsyncToJson = accessibleFieldSet.any(
-      (e) =>
-          getHelperContext(e)
-              .serializeConvertData
-              ?.returnType
-              .isDartAsyncFuture ??
-          false,
-    );
+    final hasAsyncFromJson = accessibleFieldSet.any(_hasAsyncFromJson);
+    final hasAsyncToJson = accessibleFieldSet.any(_hasAsyncToJson);
+
     if (config.createFactory) {
       final createResult = createFactory(
         accessibleFields,
@@ -170,6 +157,36 @@ class GeneratorHelper extends HelperCore with EncodeHelper, DecodeHelper {
     }
 
     yield* _addedMembers;
+  }
+
+  bool _hasAsyncFromJson(FieldElement element) {
+    final hasAsyncFromJsonInJsonKey = getHelperContext(element)
+        .deserializeConvertData
+        ?.returnType
+        .isDartAsyncFuture;
+
+    final classElement = element.type.element;
+
+    final hasAsyncFromJsonCtor = classElement is InterfaceElement
+        ? classElement.fromJsonCtor?.returnType.isDartAsyncFuture
+        : null;
+
+    return hasAsyncFromJsonInJsonKey ?? hasAsyncFromJsonCtor ?? false;
+  }
+
+  bool _hasAsyncToJson(FieldElement element) {
+    final hasAsyncToJsonInJsonKey = getHelperContext(element)
+        .serializeConvertData
+        ?.returnType
+        .isDartAsyncFuture;
+
+    final classElement = element.type.element;
+
+    final hasAsyncToJson = classElement is InterfaceElement
+        ? classElement.toJson?.returnType.isDartAsyncFuture
+        : null;
+
+    return hasAsyncToJsonInJsonKey ?? hasAsyncToJson ?? false;
   }
 }
 

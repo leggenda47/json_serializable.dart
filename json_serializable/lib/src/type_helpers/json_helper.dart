@@ -58,10 +58,21 @@ class JsonHelper extends TypeHelper<TypeHelperContextWithConfig> {
       );
     }
 
-    if (context.config.explicitToJson || toJsonArgs.isNotEmpty) {
-      return '$expression${interfaceType.isNullableType ? '?' : ''}'
+    final isToJsonAsync = toJson?.returnType.isDartAsyncFuture ?? false;
+
+    if (context.config.explicitToJson ||
+        toJsonArgs.isNotEmpty ||
+        isToJsonAsync) {
+      var output = '$expression${interfaceType.isNullableType ? '?' : ''}'
           '.toJson(${toJsonArgs.map((a) => '$a, ').join()} )';
+
+      if (isToJsonAsync) {
+        output = 'await $output';
+      }
+
+      return output;
     }
+
     return expression;
   }
 
@@ -78,8 +89,7 @@ class JsonHelper extends TypeHelper<TypeHelperContextWithConfig> {
 
     final classElement = targetType.element;
 
-    final fromJsonCtor = classElement.constructors
-        .singleWhereOrNull((ce) => ce.name == 'fromJson');
+    final fromJsonCtor = classElement.fromJsonCtor;
 
     var output = expression;
     if (fromJsonCtor != null) {
@@ -133,6 +143,7 @@ class JsonHelper extends TypeHelper<TypeHelperContextWithConfig> {
     final lambda = LambdaResult(
       output,
       '${typeToCode(targetType.promoteNonNullable())}.fromJson',
+      isAsync: fromJsonCtor?.returnType.isDartAsyncFuture ?? false,
     );
 
     return DefaultContainer(expression, lambda);
